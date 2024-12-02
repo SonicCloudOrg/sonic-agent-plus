@@ -1,6 +1,6 @@
 package api
 
-type Plugin interface {
+type IPlugin interface {
 	Start() error
 	Stop() error
 }
