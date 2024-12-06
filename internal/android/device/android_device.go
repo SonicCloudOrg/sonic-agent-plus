@@ -3,16 +3,17 @@ package device
 import (
 	"errors"
 	"fmt"
-	"github.com/SonicCloudOrg/sonic-agent-plus/api"
-	"github.com/SonicCloudOrg/sonic-agent-plus/pkg/gadb"
-	json "github.com/json-iterator/go"
-	"github.com/tidwall/gjson"
 	"io"
 	"net"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/SonicCloudOrg/sonic-agent-plus/api"
+	"github.com/SonicCloudOrg/sonic-agent-plus/pkg/gadb"
+	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 )
 
 var _ api.IDevice = (*AndroidDevice)(nil)
