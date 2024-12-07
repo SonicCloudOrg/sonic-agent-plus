@@ -35,6 +35,64 @@ type AndroidTouch struct {
 	touchLock sync.Mutex
 }
 
+func (t *AndroidTouch) Tap(data entity.TouchData, duration int64) error {
+	var err error
+	data.Type = entity.TOUCH_TYPE_DOWN
+	err = t.TouchEvent(data)
+	if err != nil {
+		return err
+	}
+	time.Sleep(time.Millisecond * time.Duration(duration))
+	data.Type = entity.TOUCH_TYPE_UP
+	err = t.TouchEvent(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *AndroidTouch) Swipe(startPoint entity.TouchData, endPoint entity.TouchData, waitTime, duration int64) error {
+	var err error
+	startPoint.Type = entity.TOUCH_TYPE_DOWN
+	var touchMode = startPoint.Mode
+	var fingerID = startPoint.FingerID
+
+	err = t.TouchEvent(startPoint)
+	if err != nil {
+		return err
+	}
+
+	lastTime := time.Now().UnixMilli()
+
+	for {
+		nowTime := time.Now().UnixMilli()
+		timeProgress := float32(nowTime-lastTime) / float32(duration)
+		if timeProgress >= 1.0 {
+			endPoint.Type = entity.TOUCH_TYPE_UP
+			err = t.TouchEvent(endPoint)
+			if err != nil {
+				return err
+			}
+			break
+		}
+		transitionX := startPoint.X + (endPoint.X-startPoint.X)*timeProgress
+		transitionY := startPoint.Y + (endPoint.Y-startPoint.Y)*timeProgress
+		err = t.TouchEvent(entity.TouchData{
+			X:        transitionX,
+			Y:        transitionY,
+			Type:     entity.TOUCH_TYPE_MOVE,
+			Mode:     touchMode,
+			FingerID: fingerID,
+		})
+		if err != nil {
+			return err
+		}
+		time.Sleep(time.Duration(waitTime) * time.Millisecond)
+	}
+
+	return nil
+}
+
 func (t *AndroidTouch) Start() error {
 	var err error
 	if t.device == nil {
@@ -72,7 +130,7 @@ func (t *AndroidTouch) Stop() error {
 
 func (t *AndroidTouch) TouchEvent(data entity.TouchData) error {
 	cmd := ""
-	if data.TouchMode == entity.TouchDefaultMode {
+	if data.Mode == entity.TOUCH_MODE_BY_DEFAULT {
 		cmd = t.genDefaultTouch(data)
 	} else {
 		cmd = t.genAirtestCmd(data)
@@ -81,34 +139,34 @@ func (t *AndroidTouch) TouchEvent(data entity.TouchData) error {
 }
 
 func (t *AndroidTouch) genDefaultTouch(data entity.TouchData) string {
-	if data.TouchType != entity.TOUCH_UP {
+	if data.Type != entity.TOUCH_TYPE_UP {
 		return fmt.Sprintf(
 			"%s %s %d %d %d\n",
 			androidTouchDefaultMode,
-			data.TouchType,
+			data.Type,
 			int(data.X),
 			int(data.Y),
 			data.FingerID)
 	} else {
 		return fmt.Sprintf(
-			"%s up %d",
+			"%s up %d\n",
 			androidTouchDefaultMode,
 			data.FingerID)
 	}
 }
 
 func (t *AndroidTouch) genAirtestCmd(data entity.TouchData) string {
-	if data.TouchType != entity.TOUCH_UP {
+	if data.Type != entity.TOUCH_TYPE_UP {
 		return fmt.Sprintf(
 			"%s %s %f %f %d\n",
 			androidTouchAritestMode,
-			data.TouchType,
+			data.Type,
 			data.X,
 			data.Y,
 			data.FingerID)
 	} else {
 		return fmt.Sprintf(
-			"%s up %d",
+			"%s up %d\n",
 			androidTouchAritestMode,
 			data.FingerID)
 	}
