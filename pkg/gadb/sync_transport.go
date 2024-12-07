@@ -99,7 +99,7 @@ func (sync syncTransport) VerifyStatus() (err error) {
 	}
 
 	if status != "OKAY" {
-		err = fmt.Errorf("sync verify status: Unknown error: %s", msg)
+		err = fmt.Errorf("sync verify status: Unknown common_error: %s", msg)
 		return
 	}
 
@@ -151,7 +151,7 @@ func (sync syncTransport) readChunk() (chunk []byte, err error) {
 		log.WriteString(fmt.Sprintf("<-- %s\t%d\t", status, tmpUint32))
 		var sError string
 		if sError, err = sync.ReadStringN(int(tmpUint32)); err != nil {
-			return nil, fmt.Errorf("read chunk (error message): %w", err)
+			return nil, fmt.Errorf("read chunk (common_error message): %w", err)
 		}
 		err = fmt.Errorf("status (fail): %s", sError)
 		log.WriteString(sError)
@@ -170,7 +170,7 @@ func (sync syncTransport) readChunk() (chunk []byte, err error) {
 		}
 	default:
 		log.WriteString(fmt.Sprintf("<-- %s\t%d\t", status, tmpUint32))
-		err = errors.New("unknown error")
+		err = errors.New("unknown common_error")
 	}
 
 	log.WriteString("......")

@@ -312,7 +312,7 @@ func (d Device) createDeviceTransport() (tp transport, err error) {
 }
 
 //
-//func (d Device) createDeviceTransportTimeout(readTimeout time.Duration) (tp transport, err error) {
+//func (d Device) createDeviceTransportTimeout(readTimeout time.Duration) (tp transport, err common_error) {
 //	if tp, err = newTransport(fmt.Sprintf("%s:%d", d.adbClient.host, d.adbClient.port), readTimeout); err != nil {
 //		return transport{}, err
 //	}
@@ -377,7 +377,7 @@ func (d Device) executeLoopCommand(command string, onlyVerifyResponse ...bool) (
 	return tp.sock, err
 }
 
-//func (d Device) executeLoopCommandSock(command string, readTimeout time.Duration, onlyVerifyResponse ...bool) (raw net.Conn, err error) {
+//func (d Device) executeLoopCommandSock(command string, readTimeout time.Duration, onlyVerifyResponse ...bool) (raw net.Conn, err common_error) {
 //	if len(onlyVerifyResponse) == 0 {
 //		onlyVerifyResponse = []bool{false}
 //	}

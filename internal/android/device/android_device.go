@@ -7,13 +7,13 @@ import (
 	"net"
 	"os"
 	"regexp"
+	"sonic-agent-plus/define/api"
 	"strings"
 	"time"
 
-	"github.com/SonicCloudOrg/sonic-agent-plus/api"
-	"github.com/SonicCloudOrg/sonic-agent-plus/pkg/gadb"
 	json "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
+	"sonic-agent-plus/pkg/gadb"
 )
 
 var _ api.IDevice = (*AndroidDevice)(nil)
@@ -68,7 +68,7 @@ func (d *AndroidDevice) installApk(apkFile *os.File) error {
 	if strings.Contains(strings.ToLower(res), "success") {
 		return nil
 	}
-	return fmt.Errorf("install %s error:%s", apkFile.Name(), res)
+	return fmt.Errorf("install %s common_error:%s", apkFile.Name(), res)
 }
 
 func (d *AndroidDevice) unInstallApk(packageName string) error {
@@ -79,7 +79,7 @@ func (d *AndroidDevice) unInstallApk(packageName string) error {
 	if strings.Contains(strings.ToLower(res), "success") {
 		return nil
 	}
-	return fmt.Errorf("uninstall %s error:%s", packageName, res)
+	return fmt.Errorf("uninstall %s common_error:%s", packageName, res)
 }
 
 func (d *AndroidDevice) StartApp(appName string) error {
@@ -97,7 +97,7 @@ func (d *AndroidDevice) StopApp(appName string) error {
 func (d *AndroidDevice) GetCurrentAppName() (string, error) {
 	output, err := d.dev.RunShellCommand("dumpsys window windows")
 	if err != nil {
-		return "", errors.New("exec command error : dumpsys window windows")
+		return "", errors.New("exec command common_error : dumpsys window windows")
 	}
 	return d.searchForCurrentPackage(output)
 }
@@ -116,7 +116,7 @@ func (d *AndroidDevice) searchForCurrentPackage(output string) (string, error) {
 func (d *AndroidDevice) GetCurrentPackageNameAndPid() (packageName string, pid string, err error) {
 	data, err := d.dev.RunShellCommand("dumpsys activity top | grep ACTIVITY")
 	if err != nil {
-		return "", "", fmt.Errorf("exec command error : " + "dumpsys activity top | grep ACTIVITY")
+		return "", "", fmt.Errorf("exec command common_error : " + "dumpsys activity top | grep ACTIVITY")
 	}
 
 	var dataSplit []string
