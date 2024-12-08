@@ -177,8 +177,11 @@ func (t *AndroidTouch) executeTouchCmd(cmd string) error {
 	defer t.touchLock.Unlock()
 	logger.Debug(cmd)
 	now := time.Now()
-	t.touchConn.SetReadDeadline(now.Add(time.Second * 2))
-	_, err := t.touchConn.Write([]byte(cmd))
+	err := t.touchConn.SetReadDeadline(now.Add(time.Second * 2))
+	if err != nil {
+		return err
+	}
+	_, err = t.touchConn.Write([]byte(cmd))
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,7 @@ package device
 import (
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"net"
 	"os"
@@ -46,7 +47,7 @@ func (d *AndroidDevice) RemoveProxy(localPort int, remotePort string) error {
 	return d.dev.ForwardKill(localPort)
 }
 
-func (d *AndroidDevice) InstallApp(apkFile *os.File) error {
+func (d *AndroidDevice) InstallApp(apkFile io.Reader) error {
 	return d.installApk(apkFile)
 }
 
@@ -54,9 +55,10 @@ func (d *AndroidDevice) UnInstallApp(packageName string) error {
 	return d.unInstallApk(packageName)
 }
 
-func (d *AndroidDevice) installApk(apkFile *os.File) error {
-	remotePath := fmt.Sprintf("/data/local/tmp/%s", apkFile.Name())
-	err := d.dev.PushFile(apkFile, remotePath, time.Now())
+func (d *AndroidDevice) installApk(apkFile io.Reader) error {
+	tmpName := uuid.NewString()
+	remotePath := fmt.Sprintf("/data/local/tmp/%s", tmpName)
+	err := d.dev.Push(apkFile, remotePath, time.Now())
 	if err != nil {
 		return err
 	}
@@ -68,7 +70,7 @@ func (d *AndroidDevice) installApk(apkFile *os.File) error {
 	if strings.Contains(strings.ToLower(res), "success") {
 		return nil
 	}
-	return fmt.Errorf("install %s common_error:%s", apkFile.Name(), res)
+	return fmt.Errorf("install common_error:%s", res)
 }
 
 func (d *AndroidDevice) unInstallApk(packageName string) error {
@@ -146,11 +148,14 @@ func (d *AndroidDevice) GetCurrentPackageNameAndPid() (packageName string, pid s
 }
 
 func (d *AndroidDevice) KeyCode(keyCode int) error {
-	_, err := d.dev.RunShellCommand(fmt.Sprintf("input keyevent %d", keyCode))
+	_, err := d.dev.RunShellCommand(fmt.Sprintf("ime keyevent %d", keyCode))
 	return err
 }
 
-func (d *AndroidDevice) ExecuteCommand(cmd string) (net.Conn, error) {
+func (d *AndroidDevice) ExecuteCommand(cmd string) (string, error) {
+	return d.dev.RunShellCommand(cmd)
+}
+func (d *AndroidDevice) ExecuteNohupCommand(cmd string) (net.Conn, error) {
 	return d.dev.RunShellLoopCommandSock(cmd)
 }
 
