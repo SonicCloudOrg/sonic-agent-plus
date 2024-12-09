@@ -115,11 +115,11 @@ func (s *SonicAndroidPlugin) Stop() error {
 }
 
 func (s *SonicAndroidPlugin) InputEvent(data string) error {
-	_, err := s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", "CODE_AC_CLEAN"))
-	if err != nil {
-		return err
-	}
-	_, err = s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", data))
+	//_, err := s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", "CODE_AC_CLEAN"))
+	//if err != nil {
+	//	return err
+	//}
+	_, err := s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", data))
 	if err != nil {
 		return err
 	}
