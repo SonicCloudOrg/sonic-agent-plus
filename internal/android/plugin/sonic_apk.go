@@ -123,6 +123,6 @@ func (s *SonicAndroidPlugin) InputEvent(data string) error {
 	if err != nil {
 		return err
 	}
-	_, err = s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", "CODE_AC_ENTER"))
+	//_, err = s.dev.ExecuteCommand(fmt.Sprintf("am broadcast -a SONIC_KEYBOARD --es msg \"%s\"", "CODE_AC_ENTER"))
 	return err
 }
