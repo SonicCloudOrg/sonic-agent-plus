@@ -43,10 +43,10 @@ func NewAritestTouchData(x, y float32, fingerID int, touchType TouchType) TouchD
 	}
 }
 
-func NewDefalutTouchData(x, y float32, fingerID int, touchType TouchType) TouchData {
+func NewDefalutTouchData(x, y, fingerID int, touchType TouchType) TouchData {
 	return TouchData{
-		X:        x,
-		Y:        y,
+		X:        float32(x),
+		Y:        float32(y),
 		Type:     touchType,
 		FingerID: fingerID,
 		Mode:     TOUCH_MODE_BY_DEFAULT,
